@@ -139,7 +139,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 126
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!114 &11472722
 MonoBehaviour:
@@ -152,11 +152,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec608cfe07e1dd24f819ed5fb5471132, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: 
-  health: 0
-  MAXHEALTH: 0
-  mana: 0
-  MAXMANA: 0
+  charName: name
+  health:
+    currentValue: 5
+    maxValue: 5
+    bar: {fileID: 0}
+  mana:
+    currentValue: 5
+    maxValue: 5
+    bar: {fileID: 0}
+  baseHealth: 0
+  baseMana: 0
   spell: 0
   ct: 0
   speed: 0
@@ -175,6 +181,10 @@ MonoBehaviour:
   XPGoal: 0
   moveCircle: {fileID: 0}
   actionCircle: {fileID: 0}
+  moveSpeed: 5
+  drag: 0.5
+  terminalRotationSpeed: 25
+  txt: {fileID: 0}
 --- !u!136 &13687450
 CapsuleCollider:
   m_ObjectHideFlags: 1

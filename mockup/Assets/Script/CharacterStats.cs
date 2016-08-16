@@ -1,18 +1,27 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Assets.Scripts;
+using UnityEngine.UI;
 
 public class CharacterStats: MonoBehaviour {
-    public string name = "name";
-    public float health;
-    public float MAXHEALTH;
-    public float mana;
-    public float MAXMANA;
+    public string charName = "name";
+
+    //[SerializeField]
+    //private Stat health;
+
+    //[SerializeField]
+    //private Stat mana;
+    public Stat health;
+    public Stat mana;
+
+    public int baseHealth;
+    public int baseMana;
+
     public bool spell;      // true = mana, false = ability points
     public float ct;
     public float speed;     // may not need
     public float MAXCT;
-    public float move;
+    public float move = 5f;
     public float jump;
     public int atk;
     public int baseAtk;
@@ -43,20 +52,114 @@ public class CharacterStats: MonoBehaviour {
 
     //public container with available skills
     List<Skill> skillList;
+    
+    public float moveSpeed = 5.0f;
+    public float drag = 0.5f;
+    public float terminalRotationSpeed = 25.0f;
+
+    private Rigidbody rb;
+    public int Index { set; get; }
+
+    public Text txt;
+
+    public void Awake()
+    {
+        health.Initialize(5f, 5f);
+        mana.Initialize(5f, 5f);
+    }
 
 	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        if (ct < MAXCT) {
-            ct += Time.deltaTime;
-        } else {
+	void Start ()
+    {
+        rb = GetComponent<Rigidbody>();
+        rb.maxAngularVelocity = terminalRotationSpeed;
+        rb.drag = drag;
+
+        moveCircle = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        actionCircle = transform.GetChild(1).GetComponent<SpriteRenderer>();
+    }
+
+    // Update is called once per frame
+    void Update() {
+        //if (ct != MAXCT)
+        //{
+        //    if (ct + Time.deltaTime >= MAXCT)
+        //    {
+        //        ct = MAXCT;
+        //        //moveCircle.transform.localScale = new Vector3(move, move, 1);
+        //    }
+        //    else {
+        //        ct += Time.deltaTime;
+        //    }
+        //}
+
+        if (ct + Time.deltaTime >= MAXCT)
+        {
+            if (ct < MAXCT)
+            {
+                moveCircle.transform.localScale = new Vector3(move, move, 1);
+            }
             ct = MAXCT;
+        } else if (ct < MAXCT)
+        {
+            ct += Time.deltaTime;
         }
-	}
+
+        //if (ct < MAXCT)
+        //{
+        //    ct += Time.deltaTime;
+        //}
+        //else
+        //{
+        //    ct = MAXCT;
+        //    moveCircle.transform.localScale = new Vector3(move, move, 1);
+        //}
+
+        if (GameManager.GM.movingChar && GameManager.GM.current == Index)
+        {
+            if (moveCircle.transform.localScale != Vector3.forward)
+            {
+                moveCharacter();
+            }
+        }
+    }
+
+    public void moveCharacter()
+    {
+        Vector3 dir = Vector3.zero;
+        dir.x = Input.GetAxisRaw("Horizontal");
+        dir.z = Input.GetAxisRaw("Vertical");
+
+        if (GameManager.GM.gesture.InputDirectionM != Vector3.zero)
+        {
+            Vector3 inputVec = GameManager.GM.gesture.InputDirectionM;
+            dir.x = inputVec.x;
+            dir.z = inputVec.z;
+        }
+
+        if (dir.magnitude > 1)
+        {
+            dir.Normalize();
+        }
+
+        Vector3 rotatedDir = GameManager.GM.camera.transform.TransformDirection(dir);
+        rotatedDir = new Vector3(rotatedDir.x, 0, rotatedDir.z);
+        rotatedDir = rotatedDir.normalized * dir.magnitude;
+
+        rb.velocity = rotatedDir * moveSpeed;
+
+        GameManager.GM.cameraAxis.transform.position = transform.position;
+
+        if (moveCircle.transform.localScale.x - dir.magnitude * Time.deltaTime < 0) {
+            moveCircle.transform.localScale = Vector3.forward;
+            rb.velocity = Vector3.zero;
+        } else {
+            moveCircle.transform.localScale = new Vector3(
+                moveCircle.transform.localScale.x - dir.magnitude * Time.deltaTime,
+                moveCircle.transform.localScale.y - dir.magnitude * Time.deltaTime,
+                1);
+        }
+    }
 
     // getters (accessors)
     public Arm getArmArmor()
@@ -152,5 +255,16 @@ public class CharacterStats: MonoBehaviour {
     public void setSkillList(List<Skill> skillList)
     {
         this.skillList = skillList;
+    }
+
+    public float getMaxHealth()
+    {
+        return health.MaxValue;
+    }
+
+    public float getMaxMana()
+    {
+        return mana.MaxValue //baseMana + mana from armor and skills and stuff
+            ;
     }
 }

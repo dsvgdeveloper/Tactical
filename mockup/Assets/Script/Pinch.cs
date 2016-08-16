@@ -21,10 +21,6 @@ public class Pinch : MonoBehaviour {
     }
 
     protected virtual void LateUpdate() {
-        //if (Input.touchCount != 2 
-        //    //Lean.LeanTouch.DragDelta.magnitude > dragThreshold ||
-        //    //Lean.LeanTouch.TwistDegrees > rotateThreshold
-        //    ) return;
 
         // Does the main camera exist?
         if (Camera.main != null)
@@ -48,25 +44,25 @@ public class Pinch : MonoBehaviour {
             //// Make sure the pinch scale is valid
             //if (Lean.LeanTouch.PinchScale > 0.0f)
             //{
-                // Store the old FOV in a temp variable
-                float fieldOfView = Camera.main.fieldOfView;
+            //// Store the old FOV in a temp variable
+            //float fieldOfView = Camera.main.fieldOfView;
 
-                // Scale the FOV based on the pinch scale
-                fieldOfView /= Lean.LeanTouch.PinchScale;
+            //// Scale the FOV based on the pinch scale
+            //fieldOfView /= Lean.LeanTouch.PinchScale;
 
-                // Clamp the FOV to out min/max values
-                fieldOfView = Mathf.Clamp(fieldOfView, Minimum, Maximum);
+            //// Clamp the FOV to out min/max values
+            //fieldOfView = Mathf.Clamp(fieldOfView, Minimum, Maximum);
 
-                // Set the new FOV
-                Camera.main.fieldOfView = fieldOfView;
-
-                //Vector3 camPos = (FindObjectOfType<GameManager>()).camera.transform.position;
-
-                //(FindObjectOfType<GameManager>()).camera.transform.position = 
-                //    new Vector3(camPos.x * Lean.LeanTouch.PinchScale,
-                //    camPos.y * Lean.LeanTouch.PinchScale,
-                //    camPos.z * Lean.LeanTouch.PinchScale);
+            //// Set the new FOV
+            //Camera.main.fieldOfView = fieldOfView;
             //}
+
+            Vector3 camPos = GameManager.GM.camera.transform.position;
+
+            GameManager.GM.camera.transform.position =
+                new Vector3(camPos.x * Lean.LeanTouch.PinchScale,
+                camPos.y * Lean.LeanTouch.PinchScale,
+                camPos.z * Lean.LeanTouch.PinchScale);
         }
     }
 }

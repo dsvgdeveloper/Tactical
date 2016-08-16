@@ -3,18 +3,21 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts;
+using System;
 
 public class GameManager : MonoBehaviour {
     public static GameManager GM;
     public GameObject uiManager;
     public GameObject battleManager;
+
     // connect soundManager
     // connect graphicsManager
     // connect settingsManager
     // vector container for characters
     public List<CharacterStats> party;
     public List<GameObject> CharList;
-    public CharacterStats current;
+    public int current;
+    public CharacterStats target;
     // vector container for item storage
     public List<Item> storage;
     public bool gameOver = false;
@@ -23,6 +26,7 @@ public class GameManager : MonoBehaviour {
     // camera controls
     // these need to be moved over to game manager
     public Camera camera;                   // main camera
+    public Gesture gesture;
 
     public bool rotating = false;          // flag for making the script run
     public int rotDir = 1;                 // roatation direction 1=   , -1=
@@ -37,6 +41,7 @@ public class GameManager : MonoBehaviour {
     public GameObject cameraAxis;
     public GameObject HUD;
     public GameObject targetHUD;
+    public GameObject joysticks;
 
     public float pinchThreshold = 0.1f;
     public float rotateThreshold = 10f;
@@ -49,6 +54,8 @@ public class GameManager : MonoBehaviour {
     public GameObject moveToTarget;
     public bool moving = false;
 
+    public float moveSpeed = 15f;
+
     void Awake ()
     {
     }
@@ -60,8 +67,13 @@ public class GameManager : MonoBehaviour {
         foreach (CharacterStats obj in FindObjectsOfType<CharacterStats>()) {
             if (obj.tag == "Player")
             {
-                party.Add(obj);
+                obj.Index = numTargets;
                 numTargets++;
+                party.Add(obj);
+            }
+            else if (obj.tag == "Enemy")
+            {
+                target = obj;
             }
         }
 
@@ -72,14 +84,34 @@ public class GameManager : MonoBehaviour {
 
         // log in player
         // load from server
+        GM.gesture = GameObject.Find("Gesture").GetComponent<Gesture>();
 
-        current = party[mostReady()];
-        cameraAxis.transform.position = current.transform.position;
+        current = 0;
+
+        for (int i = 1; i < party.Count; i++)
+        {
+            if (party[current].MAXCT > party[i].MAXCT)
+            {
+                current = i;
+            }
+        }
+
+        cameraAxis.transform.position = party[current].transform.position;
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
+
+        if (Input.GetKeyUp(KeyCode.Q))
+        {
+            party[current].health.Value -= 10f;
+        }
+        else if (Input.GetKeyUp(KeyCode.W))
+        {
+            party[current].health.Value += 10f;
+        }
+
         if (gameOver)
         {
             // set game over
@@ -125,24 +157,22 @@ public class GameManager : MonoBehaviour {
         moveToTarget = target.gameObject;
 
         if (target.tag.Equals("Player")) {
-            GameObject.Find("ManaBar").transform.localScale.Set(target.mana / target.MAXMANA, 1, 1);
-            GameObject.Find("HealthBar").transform.localScale.Set(target.health / target.MAXHEALTH, 1, 1);
-            GameObject.Find("CharacterName").GetComponent<Text>().text = target.name;
             focusOnPlayer(target);
         } else if (target.tag.Equals("Enemy")) {
-            GameObject.Find("TManaBar").transform.localScale.Set(target.mana / target.MAXMANA, 1, 1);
-            GameObject.Find("THealthBar").transform.localScale.Set(target.health / target.MAXHEALTH, 1, 1);
-            GameObject.Find("TargetName").GetComponent<Text>().text = target.name;
             focusOnEnemy(target);
         }
     }
 
     void focusOnEnemy(CharacterStats target)
     {
-        GameObject.Find("TargetName").GetComponent<Text>().text = target.name;
+        if (!targetHUD.activeInHierarchy)
+        {
+            targetHUD.SetActive(true);
+        }
+        target.moveCircle.enabled = true;
     }
 
-    void focusOnPlayer(CharacterStats target)
+    void focusOnPlayer(CharacterStats tapped)
     {
         // check if its the current focus and a player character
         // if so go to character controlling
@@ -153,21 +183,24 @@ public class GameManager : MonoBehaviour {
         // so that a swipe will move to next character in roster
         for (int i = 0; i < party.Count; i++)
         {
-            if ((target.name.ToLower()).Equals(party[i].name.ToLower()))
+            if ((tapped.name.ToLower()).Equals(party[i].name.ToLower()))
             {
-                if (target.ct / target.MAXCT >= 1 && target.tag.Equals("Player"))
+                if (tapped.ct / tapped.MAXCT >= 1)
                 {
-                    current = target;
+                    current = i;
                 }
                 targetNum = i;
                 break;
             }
         }
 
-        if ((target.name.ToLower()).Equals(current.name.ToLower()))
+        if ((tapped.name.ToLower()).Equals(party[current].name.ToLower()))
         {
+            movingChar = true;
             HUD.SetActive(false);
-            current.moveCircle.enabled = true;
+            joysticks.SetActive(true);
+            party[current].moveCircle.enabled = true;
+            party[current].actionCircle.enabled = true;
         }
     }
 
@@ -184,18 +217,22 @@ public class GameManager : MonoBehaviour {
             targetNum = 0;
         }
 
-        cameraAxis.transform.position = party[targetNum].transform.position;
+        moving = true;
+        moveToTarget = party[targetNum].gameObject;
+        //cameraAxis.transform.position = party[targetNum].transform.position;
         //camera.transform.position = cameraAxis.transform.position + (camPos - camAxis);
 
         if (party[targetNum].ct / party[targetNum].MAXCT >= 1f)
         {
-            current = party[targetNum];
+            current = targetNum;
         }
     }
 
     public void goToTopOfList()
     {
-        int top = mostReady();
+        int top;
+
+        top = mostReady();
         Debug.Log("top of list");
         //Vector3 camPos = camera.transform.position;
         //Vector3 camAxis = cameraAxis.transform.position;
@@ -204,5 +241,20 @@ public class GameManager : MonoBehaviour {
         //camera.transform.position = cameraAxis.transform.position + (camPos - camAxis);
 
         targetNum = top;
+    }
+
+    public float getCT()
+    {
+        return party[current].ct;
+    }
+
+    public CharacterStats getCurrent()
+    {
+        return party[current];
+    }
+
+    public CharacterStats getTarget()
+    {
+        return target;
     }
 }
