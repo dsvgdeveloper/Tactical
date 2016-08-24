@@ -57,6 +57,18 @@ public class CharacterStats: MonoBehaviour {
     public float drag = 0.5f;
     public float terminalRotationSpeed = 25.0f;
 
+    [SerializeField]
+    private Vector3 startPos;
+
+    [SerializeField]
+    private Vector3 lastPos;
+
+    [SerializeField]
+    private Vector3 curPos;
+
+    [SerializeField]
+    private float totalMove = 0f;
+
     private Rigidbody rb;
     public int Index { set; get; }
 
@@ -77,6 +89,10 @@ public class CharacterStats: MonoBehaviour {
 
         moveCircle = transform.GetChild(0).GetComponent<SpriteRenderer>();
         actionCircle = transform.GetChild(1).GetComponent<SpriteRenderer>();
+
+        startPos = transform.position;
+        lastPos = startPos;
+        curPos = lastPos;
     }
 
     // Update is called once per frame
@@ -120,12 +136,15 @@ public class CharacterStats: MonoBehaviour {
             if (moveCircle.transform.localScale != Vector3.forward)
             {
                 moveCharacter();
+                moveAction();
             }
         }
     }
 
     public void moveCharacter()
     {
+        lastPos = curPos;
+
         Vector3 dir = Vector3.zero;
         dir.x = Input.GetAxisRaw("Horizontal");
         dir.z = Input.GetAxisRaw("Vertical");
@@ -148,17 +167,58 @@ public class CharacterStats: MonoBehaviour {
 
         rb.velocity = rotatedDir * moveSpeed;
 
-        GameManager.GM.cameraAxis.transform.position = transform.position;
+        curPos = transform.position;
 
-        if (moveCircle.transform.localScale.x - dir.magnitude * Time.deltaTime < 0) {
-            moveCircle.transform.localScale = Vector3.forward;
+        //totalMove += Mathf.Abs(curPos.magnitude) - Mathf.Abs(lastPos.magnitude);
+
+        totalMove += Mathf.Abs(Vector3.Distance(curPos, lastPos));// * Time.deltaTime * move;
+
+        if (totalMove >= move)
+        {
+            totalMove = move;
             rb.velocity = Vector3.zero;
-        } else {
-            moveCircle.transform.localScale = new Vector3(
-                moveCircle.transform.localScale.x - dir.magnitude * Time.deltaTime,
-                moveCircle.transform.localScale.y - dir.magnitude * Time.deltaTime,
-                1);
         }
+
+        moveCircle.transform.localScale = new Vector3(
+            2 * move * (1 - (totalMove / move)),
+            2 * move * (1 - (totalMove / move)),
+            1);
+
+        //if (moveCircle.transform.localScale.x - dir.magnitude * Time.deltaTime < 0) {
+        //    moveCircle.transform.localScale = Vector3.forward;
+        //    rb.velocity = Vector3.zero;
+        //} else {
+        //    moveCircle.transform.localScale = new Vector3(
+        //        moveCircle.transform.localScale.x - dir.magnitude * Time.deltaTime,
+        //        moveCircle.transform.localScale.y - dir.magnitude * Time.deltaTime,
+        //        1);
+        //}
+
+        GameManager.GM.cameraAxis.transform.position = transform.position;
+    }
+
+    public void moveAction()
+    {
+
+        Vector3 dir = Vector3.zero;
+
+        if (GameManager.GM.gesture.InputDirectionA != Vector3.zero)
+        {
+            Vector3 inputVec = GameManager.GM.gesture.InputDirectionM;
+            dir.x = inputVec.x;
+            dir.z = inputVec.z;
+        }
+
+        if (dir.magnitude > 1)
+        {
+            dir.Normalize();
+        }
+
+        Vector3 rotatedDir = GameManager.GM.camera.transform.TransformDirection(dir);
+        rotatedDir = new Vector3(rotatedDir.x, 0, rotatedDir.z);
+        rotatedDir = rotatedDir.normalized * dir.magnitude;
+
+        actionCircle.transform.localPosition = rotatedDir;
     }
 
     // getters (accessors)

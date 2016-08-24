@@ -1,0 +1,167 @@
+[
+  {
+    "type": 3,
+    "name": "Steel Gloves",
+    "id": 0,
+    "description": "test item",
+    "value": 20,
+    "stats": {
+      "power": 1,
+      "defense": 2,
+      "vitality": 3
+    },
+    "stackable": true,
+    "rarity": 0,
+    "slug": "steel_gloves"
+  },
+  {
+    "type": 7,
+    "name": "The Great Stick",
+    "id": 1,
+    "description": "test item",
+    "value": 543,
+    "stats": {
+      "power": 1,
+      "defense": 2,
+      "vitality": 3
+    },
+    "stackable": false,
+    "rarity": 1,
+    "slug": "the_great_stick"
+  },
+  {
+    "type": 7,
+    "name": "Sword",
+    "id": 2,
+    "description": "test item",
+    "value": 50,
+    "stats": {
+      "power": 1,
+      "defense": 2,
+      "vitality": 3
+    },
+    "stackable": false,
+    "rarity": 2,
+    "slug": "sword"
+  },
+  {
+    "type": 7,
+    "name": "Shield",
+    "id": 3,
+    "description": "test item",
+    "value": 50,
+    "stats": {
+      "power": 1,
+      "defense": 2,
+      "vitality": 3
+    },
+    "stackable": false,
+    "rarity": 3,
+    "slug": "shield"
+  },
+  {
+    "type": 7,
+    "name": "Sax",
+    "id": 4,
+    "description": "test item",
+    "value": 600,
+    "stats": {
+      "power": 1,
+      "defense": 2,
+      "vitality": 3
+    },
+    "stackable": false,
+    "rarity": 4,
+    "slug": "sax"
+  },
+  {
+    "type": 9,
+    "name": "Weed",
+    "id": 5,
+    "description": "test item",
+    "value": 420,
+    "stats": {
+      "power": 1,
+      "defense": 2,
+      "vitality": 3
+    },
+    "stackable": true,
+    "rarity": 5,
+    "slug": "weed"
+  },
+  {
+    "type": 7,
+    "name": "Staff",
+    "id": 6,
+    "description": "test item",
+    "value": 15,
+    "stats": {
+      "power": 1,
+      "defense": 2,
+      "vitality": 3
+    },
+    "stackable": false,
+    "rarity": 6,
+    "slug": "staff"
+  },
+  {
+    "type": 7,
+    "name": "Staff",
+    "id": 7,
+    "description": "test item",
+    "value": 15,
+    "stats": {
+      "power": 1,
+      "defense": 2,
+      "vitality": 3
+    },
+    "stackable": false,
+    "rarity": 7,
+    "slug": "staff"
+  },
+  {
+    "type": 7,
+    "name": "Staff",
+    "id": 8,
+    "description": "test item",
+    "value": 15,
+    "stats": {
+      "power": 1,
+      "defense": 2,
+      "vitality": 3
+    },
+    "stackable": false,
+    "rarity": 8,
+    "slug": "staff"
+  },
+  {
+    "type": 7,
+    "name": "Staff",
+    "id": 9,
+    "description": "test item",
+    "value": 15,
+    "stats": {
+      "power": 1,
+      "defense": 2,
+      "vitality": 3
+    },
+    "stackable": false,
+    "rarity": 9,
+    "slug": "staff"
+  },
+  {
+    "type": 7,
+    "name": "Staff",
+    "id": 10,
+    "description": "test item",
+    "value": 15,
+    "stats": {
+      "power": 1,
+      "defense": 2,
+      "vitality": 3
+    },
+    "stackable": false,
+    "rarity": 11,
+    "slug": "staff"
+  }
+]
